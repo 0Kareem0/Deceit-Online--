@@ -1,0 +1,19 @@
+{
+  "name": "deceit-online-web",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=shared",
+    "build:server": "npm run build --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "build": "npm run build:shared && npm run build:server && npm run build:client",
+    "test:server": "cd server && npx ts-node src/game/__tests__/engine.test.ts",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev"
+  }
+}
