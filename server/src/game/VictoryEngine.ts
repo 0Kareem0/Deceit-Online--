@@ -11,6 +11,7 @@ import {
 export interface VictoryContext {
   players: Player[];
   settings: MatchSettings;
+  currentNight?: number;
 }
 
 export abstract class VictoryRule {
@@ -100,6 +101,11 @@ export class ShadowsOutnumberRule extends VictoryRule {
 export class ShadowsBreakParityRule extends VictoryRule {
   id = 'shadows_break_parity';
   evaluate(context: VictoryContext): VictoryOutcome | null {
+    // Parity victory should only evaluate after Night 1 (i.e. at least round 1 discussion or Night 2)
+    if (context.currentNight !== undefined && context.currentNight <= 1) {
+      return null;
+    }
+
     const livingKingdom = context.players.filter(
       (p) => p.isAlive && p.role?.faction === Faction.kingdom
     );

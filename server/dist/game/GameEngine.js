@@ -76,12 +76,12 @@ class GameEngine {
             if (p.isAlive && p.isBot) {
                 const botAction = BotAI_1.BotAI.decideNightAction(p, this);
                 if (botAction) {
-                    this.submitNightAction(botAction);
+                    this.submitNightAction(botAction, false);
                 }
             }
         }
     }
-    submitNightAction(action) {
+    submitNightAction(action, autoResolve = true) {
         if (this.status !== shared_1.GameStatus.inNight) {
             return { success: false, error: 'ليس وقت الليلة حالياً.' };
         }
@@ -97,10 +97,12 @@ class GameEngine {
         else {
             this.nightActions.push(action);
         }
-        // Auto-advance if all living active night roles have submitted their actions
-        const activeNightRolesCount = this.players.filter((p) => p.isAlive && p.role && p.role.nightAbilityKind !== shared_1.NightAbilityKind.none).length;
-        if (this.nightActions.length >= activeNightRolesCount) {
-            this.resolveNight();
+        // Auto-advance if all living active night roles have submitted their actions and autoResolve is true
+        if (autoResolve) {
+            const activeNightRolesCount = this.players.filter((p) => p.isAlive && p.role && p.role.nightAbilityKind !== shared_1.NightAbilityKind.none).length;
+            if (this.nightActions.length >= activeNightRolesCount) {
+                this.resolveNight();
+            }
         }
         return { success: true };
     }
@@ -263,9 +265,15 @@ class GameEngine {
         this.checkVictory();
     }
     checkVictory() {
+        if (this.status === shared_1.GameStatus.notStarted ||
+            this.status === shared_1.GameStatus.inRoleReveal ||
+            this.status === shared_1.GameStatus.inMatchIntro) {
+            return { kind: shared_1.VictoryKind.undecided };
+        }
         const outcome = this.victoryEngine.evaluate({
             players: this.players,
             settings: this.settings,
+            currentNight: this.currentNight,
         });
         if (outcome.kind !== shared_1.VictoryKind.undecided) {
             this.victory = outcome;

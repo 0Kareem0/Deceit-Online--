@@ -77,6 +77,10 @@ exports.ShadowsOutnumberRule = ShadowsOutnumberRule;
 class ShadowsBreakParityRule extends VictoryRule {
     id = 'shadows_break_parity';
     evaluate(context) {
+        // Parity victory should only evaluate after Night 1 (i.e. at least round 1 discussion or Night 2)
+        if (context.currentNight !== undefined && context.currentNight <= 1) {
+            return null;
+        }
         const livingKingdom = context.players.filter((p) => p.isAlive && p.role?.faction === shared_1.Faction.kingdom);
         const livingShadows = context.players.filter((p) => p.isAlive && p.role?.faction === shared_1.Faction.shadow);
         if (livingKingdom.length !== livingShadows.length || livingShadows.length === 0) {

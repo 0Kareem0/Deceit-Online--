@@ -98,13 +98,13 @@ export class GameEngine {
       if (p.isAlive && p.isBot) {
         const botAction = BotAI.decideNightAction(p, this);
         if (botAction) {
-          this.submitNightAction(botAction);
+          this.submitNightAction(botAction, false);
         }
       }
     }
   }
 
-  public submitNightAction(action: NightAction): { success: boolean; error?: string } {
+  public submitNightAction(action: NightAction, autoResolve = true): { success: boolean; error?: string } {
     if (this.status !== GameStatus.inNight) {
       return { success: false, error: 'ليس وقت الليلة حالياً.' };
     }
@@ -122,13 +122,15 @@ export class GameEngine {
       this.nightActions.push(action);
     }
 
-    // Auto-advance if all living active night roles have submitted their actions
-    const activeNightRolesCount = this.players.filter(
-      (p) => p.isAlive && p.role && p.role.nightAbilityKind !== NightAbilityKind.none
-    ).length;
+    // Auto-advance if all living active night roles have submitted their actions and autoResolve is true
+    if (autoResolve) {
+      const activeNightRolesCount = this.players.filter(
+        (p) => p.isAlive && p.role && p.role.nightAbilityKind !== NightAbilityKind.none
+      ).length;
 
-    if (this.nightActions.length >= activeNightRolesCount) {
-      this.resolveNight();
+      if (this.nightActions.length >= activeNightRolesCount) {
+        this.resolveNight();
+      }
     }
 
     return { success: true };
@@ -312,9 +314,18 @@ export class GameEngine {
   }
 
   public checkVictory(): VictoryOutcome {
+    if (
+      this.status === GameStatus.notStarted ||
+      this.status === GameStatus.inRoleReveal ||
+      this.status === GameStatus.inMatchIntro
+    ) {
+      return { kind: VictoryKind.undecided };
+    }
+
     const outcome = this.victoryEngine.evaluate({
       players: this.players,
       settings: this.settings,
+      currentNight: this.currentNight,
     });
 
     if (outcome.kind !== VictoryKind.undecided) {
