@@ -20,6 +20,7 @@ import { RoleDistributor } from './RoleDistributor';
 import { NightResolver } from './NightResolver';
 import { VictoryEngine } from './VictoryEngine';
 import { BotAI } from './BotAI';
+import { saveMatchResult } from '../db/matchService';
 
 export class GameEngine {
   public matchId: string;
@@ -319,6 +320,7 @@ export class GameEngine {
     if (outcome.kind !== VictoryKind.undecided) {
       this.victory = outcome;
       this.status = GameStatus.inGameOver;
+      saveMatchResult(this).catch(() => {});
     }
     return outcome;
   }

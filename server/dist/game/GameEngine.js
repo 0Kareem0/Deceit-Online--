@@ -7,6 +7,7 @@ const RoleDistributor_1 = require("./RoleDistributor");
 const NightResolver_1 = require("./NightResolver");
 const VictoryEngine_1 = require("./VictoryEngine");
 const BotAI_1 = require("./BotAI");
+const matchService_1 = require("../db/matchService");
 class GameEngine {
     matchId;
     roomCode;
@@ -269,6 +270,7 @@ class GameEngine {
         if (outcome.kind !== shared_1.VictoryKind.undecided) {
             this.victory = outcome;
             this.status = shared_1.GameStatus.inGameOver;
+            (0, matchService_1.saveMatchResult)(this).catch(() => { });
         }
         return outcome;
     }

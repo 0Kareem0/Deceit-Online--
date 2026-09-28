@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ALL_ROLES } from '../data/rolesData';
-import { RoleCard } from '../components/RoleCard';
+import { RoleDetailsModal } from '../components/RoleDetailsModal';
 import { Role, Faction } from '@deceit/shared';
 import { Search, Shield, Moon, UserCheck, X, Sparkles, Crown, ArrowLeft } from 'lucide-react';
 import { useSound } from '../context/SoundContext';
@@ -187,30 +187,10 @@ export const RoleCodex: React.FC<RoleCodexProps> = ({ onBack }) => {
 
       {/* Role Details Modal View */}
       {selectedRole && (
-        <div
-          onClick={() => setSelectedRole(null)}
-          className="fixed inset-0 z-[100] bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in"
-          style={{ top: 0, left: 0, right: 0, bottom: 0 }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto my-auto p-2"
-          >
-            <div className="flex justify-between items-center mb-2 px-2 sticky top-0 z-20">
-              <span className="text-xs font-cairo font-bold text-gold bg-stone-900/90 px-3 py-1 rounded-full border border-gold/30">
-                بطاقة الدور التفصيلية 📜
-              </span>
-              <button
-                onClick={() => setSelectedRole(null)}
-                className="p-2 rounded-full glass-panel border border-gold/40 text-gold hover:bg-gold hover:text-void transition-all bg-stone-900/90 shadow-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <RoleCard role={selectedRole} initiallyRevealed={true} />
-          </div>
-        </div>
+        <RoleDetailsModal
+          role={selectedRole}
+          onClose={() => setSelectedRole(null)}
+        />
       )}
     </div>
   );
